@@ -66,7 +66,7 @@ lvs
 
 ## Étape 3 : Automatisation avec un script de sauvegarde
 
-### Créer un script secure_backup.sh :
+### Créer un script secure_backup.sh & Ajoutez une fonction de rotation des sauvegardes :
 
 ```powershell
 sudo nano secure_backup.sh
@@ -74,4 +74,76 @@ sudo nano secure_backup.sh
 
 ```sh
 #!/bin/bash
+DATE=$(date +%Y%m%d%H%M)
+BACKUP="/backup/secure_data_$DATE.tar.gz"
+SAUVE="/mnt/secure_data"
+FILE_COUNT=£$(ls -1 | wc -1)
+
+tar -czf $BACKUP $SAUVE
+
+cd  /backup/
+
+
+if [ $file -gt 7 ]; then
+    ls -t | sed -e '1,7d' | xargs -d '\n' rm -f
+else 
+    echo error
+fi
+```
+
+### Testez le script :
+
+```powershell 
+/secure_backup.sh
+```
+
+### Automatisez avec une tâche cron :
+
+```powershell
+
+[powershell]
+crontab -e
+
+[Vi]
+0 0 3 * * * /secure_backup.sh
+
+[command Vi]
+:x 
+```
+
+## Étape 4 : Surveillance avancée avec auditd
+
+### Configurer auditd pour surveiller /etc :
+
+```powershell
+nano /etc/audit/rules.d/audit.rules
+``` 
+
+```
+-w /etc -p wa -k surveillance-etc
+```
+
+### Tester la surveillance :
+```
+ausearch -k surveillance-etc
+```
+
+### Analyser les événements :
+```
+echo "$(ausearch -k surveillance-etc -i)" > /var/log/audit_etc.log
+```
+## Étape 5 : Sécurisation avec Firewalld
+
+### Configurer un pare-feu pour SSH et HTTP/HTTPS uniquement :
+
+```
+firewall-cmd --permanent --add-service=http
+firewall-cmd --permanent --reload
+```
+
+### Bloquer des IP suspectes :
+
+### Restreindre SSH à un sous-réseau spécifique :
+
+
 
