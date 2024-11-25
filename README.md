@@ -138,12 +138,32 @@ echo "$(ausearch -k surveillance-etc -i)" > /var/log/audit_etc.log
 
 ```
 firewall-cmd --permanent --add-service=http
+firewall-cmd --permanent --service-service=cockip
+firewall-cmd --permanent --service-service=dhcpv6-client
+firewall-cmd --permanent --add-port=443/tcp
+firewall-cmd --permanent --add-port=80/tcp
+firewall-cmd --permanent --add-port=22/tcp
 firewall-cmd --permanent --reload
 ```
 
 ### Bloquer des IP suspectes :
 
-### Restreindre SSH à un sous-réseau spécifique :
+```powershell
+firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="192.168.1.100" reject'
+firewall-cmd --reload
+```
 
+### Restreindre SSH à un sous-réseau spécifique :
+```powershell
+[powershell]
+nano /etc/ssh/sshd_config
+
+[Document]
+Include /etc/ssh/sshd_config.d/*.conf
+AllowUsers *@192.168.85.1/24
+
+[powershell]
+systemctl restart sshd
+```
 
 
